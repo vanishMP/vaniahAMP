@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Vanish — анонимный школьный маркетплейс</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%);
+            color: #0f172a;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphic header */
+        .header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2c3e50);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            font-size: 0.8rem;
+            background: #e2e8f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+
+        .user-card {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .nickname-area input {
+            border: 1px solid #cbd5e1;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .nickname-area input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+        }
+        .nickname-area button {
+            background: #0f172a;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nickname-area button:hover {
+            background: #1e293b;
+            transform: scale(0.96);
+        }
+        .user-id {
+            font-size: 0.7rem;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(4px);
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1e293b;
+        }
+        .tab-btn.active {
+            background: #0f172a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-pane.active-pane {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Cards & forms */
+        .form-card, .lot-card, .topic-item, .conversation-item {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eef2ff;
+        }
+        .form-card:hover, .lot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.1);
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            background: #fefefe;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        button {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #1e293b;
+            transform: scale(0.97);
+        }
+
+        .lot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .lot-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 1rem;
+            background: #f1f5f9;
+        }
+        .lot-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        .lot-price {
+            font-weight: 700;
+            color: #059669;
+            background: #d1fae5;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+        }
+        .lot-meta {
+            font-size: 0.7rem;
+            color: #475569;
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+        }
+        .delete-btn, .message-btn {
+            background: #dc2626;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.8rem;
+        }
+        .message-btn {
+            background: #3b82f6;
+        }
+
+        .topic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .topic-item {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .topic-item:hover {
+            background: #fef9e3;
+        }
+
+        .messages-area {
+            background: #f9fafb;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .chat-messages {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .chat-message {
+            background: white;
+            padding: 0.6rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        .back-btn {
+            background: #e2e8f0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        hr {
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .header { flex-direction: column; align-items: stretch; }
+            .user-card { justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <h1>vanish<span>♻️</span></h1>
+            <div style="font-size: 0.7rem;">анонимный маркетплейс + форум + чат</div>
+        </div>
+        <div class="user-card">
+            <div class="nickname-area">
+                <input type="text" id="nicknameInput" placeholder="Ваш ник" maxlength="30">
+                <button id="saveNicknameBtn">сменить ник</button>
+            </div>
+            <div class="user-id" id="userIdDisplay"></div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="market">🛒 Маркетплейс</button>
+        <button class="tab-btn" data-tab="forum">💬 Форум</button>
+        <button class="tab-btn" data-tab="messages">💌 Сообщения</button>
+    </div>
+
+    <!-- Маркетплейс -->
+    <div id="marketPane" class="tab-pane active-pane">
+        <div class="form-card">
+            <h3>📦 Выставить новый лот</h3>
+            <input type="text" id="lotTitle" placeholder="Название товара/услуги">
+            <textarea id="lotDesc" rows="2" placeholder="Описание..."></textarea>
+            <input type="number" id="lotPrice" placeholder="Цена (BYN / руб.)">
+            <select id="lotCategory">
+                <option value="books">📚 Книги</option>
+                <option value="electronics">📱 Электроника</option>
+                <option value="clothing">👕 Одежда</option>
+                <option value="other">✨ Другое</option>
+                <option value="advice">💡 Советы (оветы)</option>
+                <option value="homework">📝 ДЗ (помощь)</option>
+                <option value="badges">🏅 Бейджи</option>
+            </select>
+            <input type="text" id="lotImageUrl" placeholder="Ссылка на изображение (необязательно)">
+            <button id="createLotBtn">➕ Выставить лот</button>
+        </div>
+        <h3>🔥 Актуальные лоты (исчезают через 7 дней)</h3>
+        <div id="lotsContainer" class="lot-grid"></div>
+    </div>
+
+    <!-- Форум -->
+    <div id="forumPane" class="tab-pane">
+        <div id="forumMainView">
+            <div class="form-card">
+                <h3>✨ Создать новую тему</h3>
+                <input type="text" id="newTopicTitle" placeholder="Тема обсуждения">
+                <button id="createTopicBtn">➕ Создать тему</button>
+            </div>
+            <h3>📌 Темы форума</h3>
+            <div id="topicsList" class="topic-list"></div>
+        </div>
+        <div id="topicDetailView" style="display: none;">
+            <button id="backToTopicsBtn" class="back-btn">← Ко всем темам</button>
+            <div id="topicDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- Сообщения -->
+    <div id="messagesPane" class="tab-pane">
+        <div id="conversationsView">
+            <h3>💬 Диалоги</h3>
+            <div id="conversationsList" class="conversation-list"></div>
+        </div>
+        <div id="chatView" style="display: none;">
+            <button id="backToConvBtn" class="back-btn">← Ко всем диалогам</button>
+            <div id="chatContent" class="form-card"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ====================== НАСТРОЙКИ API ======================
+    // ЗАМЕНИТЕ НА РЕАЛЬНЫЙ URL ВАШЕГО БЭКЕНДА ПОСЛЕ ДЕПЛОЯ
+    const API_BASE = 'https://vanish-backend.onrender.com/api';  // <-- СЮДА ВАШ URL
+
+    // ====================== АНОНИМНЫЙ ПОЛЬЗОВАТЕЛЬ ======================
+    let currentUserId = localStorage.getItem('vanish_userId');
+    let currentNickname = localStorage.getItem('vanish_nickname');
+
+    if (!currentUserId) {
+        currentUserId = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        localStorage.setItem('vanish_userId', currentUserId);
+    }
+    if (!currentNickname) {
+        currentNickname = 'Аноним_' + currentUserId.slice(-5);
+        localStorage.setItem('vanish_nickname', currentNickname);
+    }
+
+    document.getElementById('nicknameInput').value = currentNickname;
+    document.getElementById('userIdDisplay').textContent = `ID: ${currentUserId.slice(0,12)}...`;
+
+    document.getElementById('saveNicknameBtn').addEventListener('click', () => {
+        let newNick = document.getElementById('nicknameInput').value.trim();
+        if (!newNick) return alert("Ник не может быть пустым");
+        currentNickname = newNick;
+        localStorage.setItem('vanish_nickname', currentNickname);
+        document.getElementById('nicknameInput').value = currentNickname;
+        // обновляем все данные (рендер)
+        renderMarketplace();
+        renderTopicsList();
+        if (currentTopicId) renderTopicMessages(currentTopicId);
+        renderConversations();
+        alert("Ник изменён!");
+    });
+
+    // ====================== API ВЫЗОВЫ ======================
+    async function apiFetch(endpoint, options = {}) {
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers,
+            },
+        });
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+    }
+
+    // Лоты
+    async function fetchLots() {
+        return await apiFetch('/lots');
+    }
+    async function createLot(lot) {
+        return await apiFetch('/lots', {
+            method: 'POST',
+            body: JSON.stringify(lot)
+        });
+    }
+    async function deleteLot(lotId, userId) {
+        return await apiFetch(`/lots/${lotId}`, {
+            method: 'DELETE',
+            headers: { 'x-user-id': userId }
+        });
+    }
+
+    // Форум темы
+    async function fetchTopics() {
+        return await apiFetch('/forum/topics');
+    }
+    async function createTopic(topic) {
+        return await apiFetch('/forum/topics', {
+            method: 'POST',
+            body: JSON.stringify(topic)
+        });
+    }
+    async function fetchMessages(topicId) {
+        return await apiFetch(`/forum/topics/${topicId}/messages`);
+    }
+    async function createMessage(topicId, msg) {
+        return await apiFetch(`/forum/topics/${topicId}/messages`, {
+            method: 'POST',
+            body: JSON.stringify(msg)
+        });
+    }
+
+    // Приватные сообщения
+    async function fetchConversations(userId) {
+        return await apiFetch(`/messages/conversations/${userId}`);
+    }
+    async function fetchPrivateMessages(userId, otherId) {
+        return await apiFetch(`/messages/${userId}/${otherId}`);
+    }
+    async function sendPrivateMessage(msg) {
+        return await apiFetch('/messages', {
+            method: 'POST',
+            body: JSON.stringify(msg)
+        });
+    }
+
+    // ====================== МАРКЕТПЛЕЙС ======================
+    async function renderMarketplace() {
+        try {
+            const lots = await fetchLots();
+            const container = document.getElementById('lotsContainer');
+            if (!lots.length) {
+                container.innerHTML = `<div class="empty-msg">✨ Пока нет лотов. Станьте первым!</div>`;
+                return;
+            }
+            const categoryIcons = { books:"📚", electronics:"📱", clothing:"👕", other:"✨", advice:"💡", homework:"📝", badges:"🏅" };
+            container.innerHTML = lots.map(lot => {
+                const imageHtml = lot.imageUrl ? `<img class="lot-image" src="${lot.imageUrl}" onerror="this.src='https://placehold.co/400x200?text=no+image'">` 
+                                                : `<div class="lot-image" style="display:flex;align-items:center;justify-content:center;background:#eef2ff;">📦 без фото</div>`;
+                const isOwner = lot.userId === currentUserId;
+                return `
+                    <div class="lot-card">
+                        ${imageHtml}
+                        <div class="lot-title">${escapeHtml(lot.title)}</div>
+                        <div class="lot-price">${lot.price} ₽</div>
+                        <div>${escapeHtml(lot.desc.substring(0, 80))}${lot.desc.length>80?'…':''}</div>
+                        <div class="lot-meta">
+                            <span>👤 ${escapeHtml(lot.nickname)}  ${categoryIcons[lot.category]||'✨'}</span>
+                            <span>🕒 ${formatDate(lot.createdAt)}</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            ${!isOwner ? `<button class="message-btn" data-seller-id="${lot.userId}" data-seller-name="${escapeHtml(lot.nickname)}">💬 Написать продавцу</button>` : ''}
+                            ${isOwner ? `<button class="delete-btn" data-id="${lot.id}" data-user="${lot.userId}">🗑️ удалить</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    const userId = btn.getAttribute('data-user');
+                    if (userId !== currentUserId) return alert("Не ваш лот");
+                    if (confirm("Удалить?")) {
+                        await deleteLot(id, userId);
+                        renderMarketplace();
+                    }
+                });
+            });
+            document.querySelectorAll('.message-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const sellerId = btn.getAttribute('data-seller-id');
+                    const sellerName = btn.getAttribute('data-seller-name');
+                    sendMessageToSeller(sellerId, sellerName);
+                });
+            });
+        } catch (err) {
+            console.error(err);
+            document.getElementById('lotsContainer').innerHTML = '<div class="empty-msg">Ошибка загрузки лотов</div>';
+        }
+    }
+
+    document.getElementById('createLotBtn').addEventListener('click', async () => {
+        const title = document.getElementById('lotTitle').value;
+        const desc = document.getElementById('lotDesc').value;
+        const price = document.getElementById('lotPrice').value;
+        const category = document.getElementById('lotCategory').value;
+        const imageUrl = document.getElementById('lotImageUrl').value;
+        if (!title || !desc || !price) return alert("Заполните все поля");
+        await createLot({ title, desc, price: Number(price), category, imageUrl, userId: currentUserId, nickname: currentNickname });
+        document.getElementById('lotTitle').value = '';
+        document.getElementById('lotDesc').value = '';
+        document.getElementById('lotPrice').value = '';
+        document.getElementById('lotImageUrl').value = '';
+        renderMarketplace();
+    });
+
+    // ====================== ФОРУМ ======================
+    async function renderTopicsList() {
+        try {
+            const topics = await fetchTopics();
+            const container = document.getElementById('topicsList');
+            if (!topics.length) {
+                container.innerHTML = `<div class="empty-msg">💬 Нет тем. Создайте первую!</div>`;
+                return;
+            }
+            container.innerHTML = topics.map(topic => `
+                <div class="topic-item" data-topic-id="${topic.id}">
+                    <div>
+                        <div class="topic-title">📌 ${escapeHtml(topic.title)}</div>
+                        <div class="topic-author">автор: ${escapeHtml(topic.nickname)} • ${formatDate(topic.createdAt)}</div>
+                    </div>
+                    <span>➡️</span>
+                </div>
+            `).join('');
+            document.querySelectorAll('.topic-item').forEach(el => {
+                el.addEventListener('click', () => openTopicDetail(el.getAttribute('data-topic-id')));
+            });
+        } catch(err) { console.error(err); }
+    }
+
+    let currentTopicId = null;
+    async function openTopicDetail(topicId) {
+        currentTopicId = topicId;
+        document.getElementById('forumMainView').style.display = 'none';
+        document.getElementById('topicDetailView').style.display = 'block';
+        await renderTopicMessages(topicId);
+    }
+
+    async function renderTopicMessages(topicId) {
+        const topic = (await fetchTopics()).find(t => t.id == topicId);
+        if (!topic) return closeTopicDetail();
+        const messages = await fetchMessages(topicId);
+        const contentDiv = document.getElementById('topicDetailContent');
+        contentDiv.innerHTML = `
+            <div class="form-card">
+                <h3>💬 ${escapeHtml(topic.title)}</h3>
+                <div class="messages-area" id="messagesList">
+                    ${messages.length ? messages.map(msg => `
+                        <div class="message">
+                            <strong>${escapeHtml(msg.nickname)}</strong> 
+                            <span style="font-size:0.7rem;">${formatDate(msg.createdAt)}</span>
+                            <div>${escapeHtml(msg.content)}</div>
+                        </div>
+                    `).join('') : '<div class="empty-msg">Сообщений нет</div>'}
+                </div>
+                <hr>
+                <textarea id="newMessageInput" rows="2" placeholder="Ваше сообщение..."></textarea>
+                <button id="sendMessageBtn">📨 Отправить</button>
+            </div>
+        `;
+        document.getElementById('sendMessageBtn').onclick = async () => {
+            const content = document.getElementById('newMessageInput').value.trim();
+            if (!content) return;
+            await createMessage(topicId, { content, userId: currentUserId, nickname: currentNickname });
+            renderTopicMessages(topicId);
+        };
+    }
+
+    function closeTopicDetail() {
+        currentTopicId = null;
+        document.getElementById('forumMainView').style.display = 'block';
+        document.getElementById('topicDetailView').style.display = 'none';
+        renderTopicsList();
+    }
+
+    document.getElementById('createTopicBtn').addEventListener('click', async () => {
+        const title = document.getElementById('newTopicTitle').value.trim();
+        if (!title) return;
+        await createTopic({ title, userId: currentUserId, nickname: currentNickname });
+        document.getElementById('newTopicTitle').value = '';
+        renderTopicsList();
+    });
+    document.getElementById('backToTopicsBtn').addEventListener('click', closeTopicDetail);
+
+    // ====================== ПРИВАТНЫЕ СООБЩЕНИЯ ======================
+    let currentChatUserId = null;
+    let currentChatNickname = null;
+
+    async function renderConversations() {
+        try {
+            const conversations = await fetchConversations(currentUserId);
+            const container = document.getElementById('conversationsList');
+            if (!conversations.length) {
+                container.innerHTML = `<div class="empty-msg">Нет диалогов. Напишите продавцу из объявления.</div>`;
+                return;
+            }
+            // группируем по собеседникам
+            const participants = new Map();
+            conversations.forEach(msg => {
+                const otherId = msg.fromUserId === currentUserId ? msg.toUserId : msg.fromUserId;
+                if (!participants.has(otherId)) participants.set(otherId, { lastMsg: msg, nickname: null });
+                else if (msg.createdAt > participants.get(otherId).lastMsg.createdAt) participants.get(otherId).lastMsg = msg;
+            });
+            // получаем ники (из лотов или форума) – упрощённо
+            for (let [uid, data] of participants.entries()) {
+                const lots = await fetchLots();
+                const found = lots.find(l => l.userId === uid);
+                data.nickname = found ? found.nickname : 'Пользователь';
+            }
+            const sorted = Array.from(participants.values()).sort((a,b) => b.lastMsg.createdAt - a.lastMsg.createdAt);
+            container.innerHTML = sorted.map(p => `
+                <div class="conversation-item" data-user-id="${p.lastMsg.fromUserId === currentUserId ? p.lastMsg.toUserId : p.lastMsg.fromUserId}" data-user-name="${escapeHtml(p.nickname)}">
+                    <div>
+                        <strong>${escapeHtml(p.nickname)}</strong>
+                        <div style="font-size:0.8rem;">${escapeHtml(p.lastMsg.content.substring(0, 50))}${p.lastMsg.content.length>50?'…':''}</div>
+                    </div>
+                    <span>💬</span>
+                </div>
+            `).join('');
+            document.querySelectorAll('.conversation-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const uid = el.getAttribute('data-user-id');
+                    const uname = el.getAttribute('data-user-name');
+                    openChatWithUser(uid, uname);
+                });
+            });
+        } catch(err) { console.error(err); }
+    }
+
+    async function openChatWithUser(userId, nickname, autoMessage = null) {
+        currentChatUserId = userId;
+        currentChatNickname = nickname;
+        if (document.getElementById('messagesPane').classList.contains('active-pane')) {
+            document.getElementById('conversationsView').style.display = 'none';
+            document.getElementById('chatView').style.display = 'block';
+            await renderChatWithUser(userId);
+            if (autoMessage) {
+                setTimeout(() => {
+                    const input = document.getElementById('chatMessageInput');
+                    if (input) input.value = autoMessage;
+                }, 100);
+            }
+        }
+    }
+
+    async function renderChatWithUser(userId) {
+        const messages = await fetchPrivateMessages(currentUserId, userId);
+        const chatDiv = document.getElementById('chatContent');
+        chatDiv.innerHTML = `
+            <h3>💬 Чат с ${escapeHtml(currentChatNickname)}</h3>
+            <div class="chat-messages" id="chatMessagesList">
+                ${messages.map(msg => `
+                    <div class="chat-message">
+                        <strong>${escapeHtml(msg.fromUserId === currentUserId ? currentNickname : currentChatNickname)}</strong>
+                        <small> ${formatDate(msg.createdAt)}</small>
+                        <div>${escapeHtml(msg.content)}</div>
+                    </div>
+                `).join('')}
+                ${messages.length === 0 ? '<div class="empty-msg">Нет сообщений</div>' : ''}
+            </div>
+            <textarea id="chatMessageInput" rows="2" placeholder="Ваше сообщение..."></textarea>
+            <button id="sendChatBtn">Отправить</button>
+        `;
+        document.getElementById('sendChatBtn').onclick = async () => {
+            const content = document.getElementById('chatMessageInput').value.trim();
+            if (!content) return;
+            await sendPrivateMessage({ fromUserId: currentUserId, toUserId: userId, content });
+            renderChatWithUser(userId);
+        };
+        const msgsDiv = document.getElementById('chatMessagesList');
+        if (msgsDiv) msgsDiv.scrollTop = msgsDiv.scrollHeight;
+    }
+
+    function closeChat() {
+        currentChatUserId = null;
+        document.getElementById('conversationsView').style.display = 'block';
+        document.getElementById('chatView').style.display = 'none';
+        renderConversations();
+    }
+
+    function sendMessageToSeller(sellerId, sellerName) {
+        const messagesTab = document.querySelector('.tab-btn[data-tab="messages"]');
+        if (!messagesTab.classList.contains('active')) messagesTab.click();
+        setTimeout(() => openChatWithUser(sellerId, sellerName, "Здравствуйте! Интересует ваш лот."), 50);
+    }
+
+    document.getElementById('backToConvBtn').addEventListener('click', closeChat);
+
+    // ====================== ВСПОМОГАТЕЛЬНЫЕ ======================
+    function formatDate(timestamp) {
+        const diff = Date.now() - new Date(timestamp).getTime();
+        const minutes = Math.floor(diff / 60000);
+        if (minutes < 1) return 'только что';
+        if (minutes < 60) return `${minutes} мин назад`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} ч назад`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days} д назад`;
+        return new Date(timestamp).toLocaleDateString();
+    }
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
+    }
+
+    // Переключение вкладок
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.getAttribute('data-tab');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
+            if (tab === 'market') {
+                document.getElementById('marketPane').classList.add('active-pane');
+                renderMarketplace();
+            } else if (tab === 'forum') {
+                document.getElementById('forumPane').classList.add('active-pane');
+                renderTopicsList();
+                if (currentTopicId) closeTopicDetail();
+                else document.getElementById('forumMainView').style.display = 'block';
+                document.getElementById('topicDetailView').style.display = 'none';
+            } else if (tab === 'messages') {
+                document.getElementById('messagesPane').classList.add('active-pane');
+                if (currentChatUserId) {
+                    document.getElementById('conversationsView').style.display = 'none';
+                    document.getElementById('chatView').style.display = 'block';
+                    renderChatWithUser(currentChatUserId);
+                } else {
+                    document.getElementById('conversationsView').style.display = 'block';
+                    document.getElementById('chatView').style.display = 'none';
+                    renderConversations();
+                }
+            }
+        });
+    });
+
+    // Инициализация
+    renderMarketplace();
+    renderTopicsList();
+    renderConversations();
+    document.getElementById('topicDetailView').style.display = 'none';
+    document.getElementById('forumMainView').style.display = 'block';
+    document.getElementById('conversationsView').style.display = 'block';
+    document.getElementById('chatView').style.display = 'none';
+</script>
+</body>
+</html>
